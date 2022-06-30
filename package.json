@@ -28,6 +28,9 @@
     "require": "./dist/index.cjs",
     "default": "./dist/index.modern.js"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "prepublish": "npm t && npm run build",
     "test": "jest",
