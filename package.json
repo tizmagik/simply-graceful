@@ -3,7 +3,20 @@
   "type": "module",
   "version": "1.0.0",
   "description": "Simple graceful shutdown, liveness and readiness probe manager for NodeJS services",
-  "keywords": [],
+  "keywords": [
+    "kubernetes",
+    "k8s",
+    "graceful",
+    "shutdown",
+    "liveness",
+    "readiness",
+    "probe"
+  ],
+  "homepage": "https://github.com/tizmagik/simply-graceful",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tizmagik/simply-graceful"
+  },
   "author": "Jeremy Gayed (https://github.com/tizmagik)",
   "license": "ISC",
   "source": "src/index.ts",
@@ -16,6 +29,7 @@
     "default": "./dist/index.modern.js"
   },
   "scripts": {
+    "prepublish": "npm t && npm run build",
     "test": "jest",
     "build": "microbundle",
     "dev": "microbundle watch"
