@@ -63,4 +63,4 @@ export default async function Server(): Promise<Server> {
 
 ## Config
 
-Configuration options can be seen in [GracefulConfig](./src/index.ts) type. More docs TK.
+Configuration options can be seen in [SimplyGracefulConfig](./src/index.ts#L13) type. More docs TK.
