@@ -1,4 +1,4 @@
-# simply-graceful :hibiscus:
+# simply-graceful :hibiscus: [![npm version](https://badge.fury.io/js/simply-graceful.svg)](https://badge.fury.io/js/simply-graceful)
 
 A simple utility that provides asynchronous liveness and readiness probe management. It also handles graceful server close/process exiting to allow current requests in flight to complete in a best effort.
 
