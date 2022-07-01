@@ -1,7 +1,7 @@
 {
   "name": "simply-graceful",
   "type": "module",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Simple graceful shutdown, liveness and readiness probe manager for NodeJS services",
   "keywords": [
     "kubernetes",
