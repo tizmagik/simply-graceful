@@ -19,7 +19,7 @@ export type SimplyGracefulConfig = {
   /** Node HTTP Server */
   server?: Server;
 
-  /** Skip process signals */
+  /** Skip process signals (useful to skip during local dev) */
   skipProcessSignals?: boolean;
 
   /** Console-like interface to log messaes, defaults to `console` */

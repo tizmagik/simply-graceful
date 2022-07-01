@@ -22,14 +22,14 @@ import type { Server } from "http";
 import SimplyGraceful from "simply-graceful";
 import { someMiddleware, anotherMiddleware } from "./middlewares";
 
-export default async function Server(): Promise<Server> {
+export default async function CreateServer(): Promise<Server> {
   const { PORT = 3000, ENV = "development" } = process.env;
 
   const app = express();
 
   const graceful = new SimplyGraceful({
     app,
-    skipProcessSignals: !ENV.includes("production"),
+    skipProcessSignals: ENV !== "production",
     logger: console,
     livePath: "/.live",
     readyPath: "/.ready",
