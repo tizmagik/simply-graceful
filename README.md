@@ -30,6 +30,11 @@ export default async function Server(): Promise<Server> {
   const graceful = new SimplyGraceful({
     app,
     skipProcessSignals: !ENV.includes("production"),
+    logger: console,
+    livePath: "/.live",
+    readyPath: "/.ready",
+    grace: 5_000,
+    delay: 30_000,
   });
 
   // someMiddleware here may do async stuff, so we have it return a callback

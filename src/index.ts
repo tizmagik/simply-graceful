@@ -112,8 +112,8 @@ export default class SimplyGraceful {
     this.app = app;
 
     // setup status probes
-    this.app.get("/.live", (_req, res) => res.sendStatus(200));
-    this.app.get("/.ready", (_req, res) =>
+    this.app.get(this.config.livePath!, (_req, res) => res.sendStatus(200));
+    this.app.get(this.config.readyPath!, (_req, res) =>
       this.app?.get("ready") ? res.sendStatus(200) : res.sendStatus(503)
     );
   }
