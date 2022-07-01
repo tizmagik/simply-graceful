@@ -1,6 +1,8 @@
 import type { Server } from "http";
 import type { Express } from "express";
 
+const SG_LOG_PREFIX = "[SimplyGraceful]";
+const SG_READY = "__sg_ready";
 const SIGNALS: NodeJS.Signals[] = ["SIGINT", "SIGHUP", "SIGTERM"];
 const GRACE = 5_000; // 5 second grace before closing server connection
 const DELAY = 30_000; // 30 second force exit deadline
@@ -69,10 +71,6 @@ export default class SimplyGraceful {
     grace = GRACE,
     delay = DELAY,
   }: SimplyGracefulConfig = {}) {
-    if (app) this.setApp(app);
-    if (server) this.setServer(server);
-    this.logger = logger;
-
     Object.assign(this.config, {
       livePath,
       readyPath,
@@ -80,13 +78,17 @@ export default class SimplyGraceful {
       delay,
     });
 
+    if (app) this.setApp(app);
+    if (server) this.setServer(server);
+    this.logger = logger;
+
     if (skipProcessSignals) return;
 
     // setup our process signal listeners
     for (const signal of SIGNALS) {
       process.on(signal, () => {
         // log out as an Error
-        this.logger.log(`${signal} - Starting shutdown...`);
+        this.logger.log(`${SG_LOG_PREFIX} ${signal} - Starting shutdown...`);
         this.shutdown();
       });
     }
@@ -99,7 +101,11 @@ export default class SimplyGraceful {
 
     // process rejection handler
     process.on("unhandledRejection", (reason, promise) => {
-      this.logger.error("[unhandledRejection]", reason, promise);
+      this.logger.error(
+        `${SG_LOG_PREFIX} [unhandledRejection]`,
+        reason,
+        promise
+      );
       this.shutdown(1);
     });
   }
@@ -114,7 +120,7 @@ export default class SimplyGraceful {
     // setup status probes
     this.app.get(this.config.livePath!, (_req, res) => res.sendStatus(200));
     this.app.get(this.config.readyPath!, (_req, res) =>
-      this.app?.get("ready") ? res.sendStatus(200) : res.sendStatus(503)
+      this.app?.get(SG_READY) ? res.sendStatus(200) : res.sendStatus(503)
     );
   }
 
@@ -123,7 +129,9 @@ export default class SimplyGraceful {
     this.setNotReady();
 
     if (indicator in this.indicators) {
-      throw new Error(`Indicator ${indicator} has already been waited on.`);
+      throw new Error(
+        `${SG_LOG_PREFIX} Indicator '${indicator}' has already been waited on.`
+      );
     }
 
     // default to false for the given indicator
@@ -131,13 +139,13 @@ export default class SimplyGraceful {
   }
 
   public setNotReady(): void {
-    this.app?.set("ready", false);
+    this.app?.set(SG_READY, false);
   }
 
   public signalReady(indicator: string): void {
     if (!(indicator in this.indicators)) {
       throw new Error(
-        `Indicator ${indicator} has not yet been waited on. Did you forget to call waitForReady(${indicator})?`
+        `${SG_LOG_PREFIX} Indicator ${indicator} has not yet been waited on. Did you forget to call waitForReady('${indicator}')?`
       );
     }
 
@@ -156,7 +164,7 @@ export default class SimplyGraceful {
 
     if (anyNotReady) return;
 
-    this.app?.set("ready", true);
+    this.app?.set(SG_READY, true);
   }
 
   private shutdown(exitCode = 0): void {
@@ -167,14 +175,14 @@ export default class SimplyGraceful {
     setTimeout(() => {
       this.server?.close((err) => {
         if (err) this.logger.error(err);
-        this.logger.log("Server closed cleanly, exiting...");
+        this.logger.log(`${SG_LOG_PREFIX} Server closed cleanly, exiting...`);
         process.nextTick(() => process.exit(exitCode));
       });
     }, this.config.grace).unref();
 
     // force exit deadline
     setTimeout(() => {
-      this.logger.log("Server preoccupied, force exiting...");
+      this.logger.log(`${SG_LOG_PREFIX} Server preoccupied, force exiting...`);
       process.nextTick(() => process.exit(exitCode));
     }, this.config.delay).unref();
   }
